@@ -45,9 +45,9 @@ public class CsvProcessorServiceImpl implements CsvProcessorService {
             lote.iniciarProcessamento();
             loteRepository.save(lote);
 
-            AtomicInteger chunkIndex    = new AtomicInteger(0);
-            AtomicInteger totalSalvos  = new AtomicInteger(0);
-            AtomicInteger totalErros   = new AtomicInteger(0);
+            AtomicInteger chunkIndex  = new AtomicInteger(0);
+            AtomicInteger totalSalvos = new AtomicInteger(0);
+            AtomicInteger totalErros  = new AtomicInteger(0);
 
             CsvParser.ParseResult resultado = csvParser.processarEmChunks(filePath, chunk -> {
                 int idx = chunkIndex.getAndIncrement();
@@ -77,16 +77,14 @@ public class CsvProcessorServiceImpl implements CsvProcessorService {
                     lote.getFinalizadoEm()
             ));
 
-            log.info("Lote {} concluído: {} válidas, {} salvas, {} erros, {}ms",
-                    loteId, resultado.totalValidas(), totalSalvos.get(),
+            log.info("Lote {} concluído: {} lidas, {} salvas, {} erros, {}ms",
+                    loteId, resultado.totalLidas(), totalSalvos.get(),
                     totalErros.get(), lote.getTempoTotalMs());
 
         } catch (Exception ex) {
             log.error("Erro crítico ao processar lote {}: {}", loteId, ex.getMessage(), ex);
-
             lote.marcarErro();
             loteRepository.save(lote);
-
             eventProducer.publicarLoteFinalizado(new LoteFinalizadoEvent(
                     loteId, lote.getStatus(), lote.getTotalLinhas(),
                     lote.getLinhasSucesso(), lote.getLinhasErro(),
@@ -106,10 +104,14 @@ public class CsvProcessorServiceImpl implements CsvProcessorService {
 
         long tempoChunkMs = System.currentTimeMillis() - inicioChunk;
 
-        totalSalvos.addAndGet(batchResult.salvos());
-        totalErros.addAndGet(batchResult.erros());
+        int salvosAcumulados = totalSalvos.addAndGet(batchResult.salvos());
+        int errosAcumulados  = totalErros.addAndGet(batchResult.erros() + batchResult.duplicados());
 
-        // ── Persiste o registro na tabela lote_processamento ─────────────────
+        lote.setLinhasProcessadas(salvosAcumulados + errosAcumulados);
+        lote.setLinhasSucesso(salvosAcumulados);
+        lote.setLinhasErro(errosAcumulados);
+        loteRepository.save(lote);
+
         loteProcessamentoService.registrarChunk(
                 lote,
                 idx,
@@ -120,7 +122,6 @@ public class CsvProcessorServiceImpl implements CsvProcessorService {
                 tempoChunkMs
         );
 
-        // ── Publica evento Kafka de chunk concluído ───────────────────────────
         eventProducer.publicarChunkConcluido(new ChunkConcluidoEvent(
                 lote.getId(), idx, chunk.size(),
                 batchResult.salvos(), batchResult.duplicados(), batchResult.erros(),
