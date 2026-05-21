@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Backgrounds */
+  --bg:   #f5f6fa;
+  --bg-2: #ffffff;
+  --bg-3: #f0f1f5;
+  --bg-4: #e8eaf0;
+
+  /* Borders */
+  --border:       rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.16);
+
+  /* Text */
+  --text-primary:   #0f1117;
+  --text-secondary: #5a6072;
+  --text-muted:     #9ba3b8;
+
+  /* Accent — azul índigo */
+  --accent:      #4263eb;
+  --accent-dim:  rgba(66,99,235,0.08);
+  --accent-hover:#3451c7;
+
+  /* Semantic */
+  --green:      #0cab6b;
+  --green-dim:  rgba(12,171,107,0.10);
+  --red:        #e5484d;
+  --red-dim:    rgba(229,72,77,0.10);
+  --yellow:     #d08c00;
+  --yellow-dim: rgba(208,140,0,0.10);
+  --purple:     #6e40c9;
+  --purple-dim: rgba(110,64,201,0.10);
+
+  /* Shape */
+  --radius:    12px;
+  --radius-sm:  8px;
+  --radius-lg: 16px;
+
+  /* Shadow */
+  --shadow:    0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.10), 0 12px 40px rgba(0,0,0,0.07);
+
+  /* Type */
+  --font:      'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --transition: 0.16s cubic-bezier(0.4,0,0.2,1);
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { cursor: pointer; font-family: var(--font); }
+input, select, textarea { font-family: var(--font); }
+a { color: inherit; text-decoration: none; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+
+.animate-in { animation: fadeIn 0.25s ease both; }
+.spin        { animation: spin 0.9s linear infinite; }
