@@ -41,7 +41,7 @@ Sistema fullstack para importação, processamento e consulta de leads via arqui
 ### 1. Backend e infraestrutura
 
 ```bash
-cd desafio
+cd desafio_final
 docker compose up --build
 ```
 
